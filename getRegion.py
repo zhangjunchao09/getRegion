@@ -8,12 +8,15 @@ bashUrl = "http://www.stats.gov.cn/tjsj/tjbz/tjyqhdmhcxhfdm/2019/"
 
 
 # 写文件
-def writedoc(ss, code):
+def writedoc(ss, code, l):
     # 打开文件
     # 编码为utf-8
     with open("E:\\Python爬取的文件\\" + code + ".txt", 'a', encoding='utf-8') as f:
         # 写文件
+        ss = ss + ' ' + str(l)
         f.write(ss + '\r\n')
+        print(ss)
+
 
 # 根据详细页面url获取目标字符串
 def geturl(url, code, path, l):
@@ -24,7 +27,7 @@ def geturl(url, code, path, l):
     r.encoding = "GBK"
     soup = BeautifulSoup(r.text, "html.parser")
     # 找出类名为 info-zi mb15 下的所有p标签
-    trs = soup.findAll('tr',{'class':{'countytr','citytr','towntr'}})
+    trs = soup.findAll('tr', {'class': {'countytr', 'citytr', 'towntr'}})
     # 用来储存最后需要写入文件的字符串
     for tr in trs:
         aas = tr.find_all("a")
@@ -34,9 +37,9 @@ def geturl(url, code, path, l):
                 td1 = tds[0]
                 td2 = tds[1]
                 mlist = str(td1.string) + " " + str(td2.string)
-                writedoc(mlist, code)
+                writedoc(mlist, code, l)
         else:
-            if l == 2 :
+            if l == 2:
                 string_aurl = bashUrl + str(tr.a.get("href"))
             if l == 3:
                 string_aurl = bashUrl + path + str(tr.a.get("href"))
@@ -47,12 +50,12 @@ def geturl(url, code, path, l):
             if l == 5:
                 string_aurl = bashUrl + path + str(tr.a.get("href"))
             if l <= 5:
-                geturl(string_aurl, code, path,l)
+                geturl(string_aurl, code, path, l)
                 tds = tr.find_all("td")
                 td1 = tds[0]
                 td2 = tds[1]
                 mlist = str(td1.a.string) + " " + str(td2.a.string)
-                writedoc(mlist, code)
+                writedoc(mlist, code, l)
 
 
 # 获取目标网址
@@ -70,15 +73,28 @@ def getalldoc():
     aas = soup.find_all("a")
     # 先创建目录
     mkdir("E:\\Python爬取的文件\\")
-    for a in aas:
-        string_a = a.next_element
-        if string_a == '京ICP备05034670号':
-            break
-        path =  str(a.get("href")).split('.')[0] + "/"
-        l = 1
-        string_aurl = bashUrl + str(a.get("href"))
-        # 请求详细页面
-        geturl(string_aurl, string_a, path, l)
+
+    a = aas[0]
+    string_a = a.next_element
+    path = str(a.get("href")).split('.')[0] + "/"
+    l = 1
+    string_aurl = bashUrl + str(a.get("href"))
+    # 请求详细页面
+    geturl(string_aurl, string_a, path, l)
+    writedoc(string_a, string_a, l)
+
+
+#   for a in aas:
+#       string_a = a.next_element
+#       if string_a == '京ICP备05034670号':
+#           break
+#       path = str(a.get("href")).split('.')[0] + "/"
+#       l = 1
+#       string_aurl = bashUrl + str(a.get("href"))
+#       # 请求详细页面
+#       geturl(string_aurl, string_a, path, l)
+#       writedoc(string_a, string_a, l)
+
 
 def mkdir(path):
     # 去除首位空格
@@ -98,6 +114,7 @@ def mkdir(path):
     else:
         # 如果目录存在则不创建，并提示目录已存在
         return False
+
 
 if __name__ == "__main__":
     getalldoc()
