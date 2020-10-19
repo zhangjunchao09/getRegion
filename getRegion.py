@@ -10,6 +10,7 @@ headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3'}
 bashUrl = "http://www.stats.gov.cn/tjsj/tjbz/tjyqhdmhcxhfdm/2019/"
 
+sleep_int = 5
 
 # 写文件
 def writedoc(ss, code, l):
@@ -28,7 +29,9 @@ def get_town_url(url, code, path):
     # 请求详细页面
     r = requests.get(url, headers=headers)
     while r.status_code != 200:
-        time.sleep(5)
+        string_error = url + '\t' + str(r.status_code) + '\t' + code + '\t' + path
+        print(string_error)
+        time.sleep(sleep_int)
         r = requests.get(url, headers=headers)
     # 改编码
     r.encoding = "GBK"
@@ -57,8 +60,10 @@ def get_county_url(url, code, path):
     # 请求详细页面
     r = requests.get(url, headers=headers)
     while r.status_code != 200:
-        time.sleep(5)
-    r = requests.get(url, headers=headers)
+        string_error = url + '\t' + str(r.status_code) + '\t' + code + '\t' + path
+        print(string_error)
+        time.sleep(sleep_int)
+        r = requests.get(url, headers=headers)
     # 改编码
     r.encoding = "GBK"
     soup = BeautifulSoup(r.text, "html.parser")
@@ -89,7 +94,9 @@ def get_city_url(url, code, path):
     # 请求详细页面
     r = requests.get(url, headers=headers)
     while r.status_code != 200:
-        time.sleep(5)
+        string_error = url + '\t' + str(r.status_code) + '\t' + code + '\t' + path
+        print(string_error)
+        time.sleep(sleep_int)
         r = requests.get(url, headers=headers)
     # 改编码
     r.encoding = "GBK"
@@ -123,7 +130,7 @@ def getalldoc():
     # 使用request去get目标网址
     res = requests.get(testurl, headers=headers)
     while res.status_code != 200:
-        time.sleep(5)
+        time.sleep(sleep_int)
         res = requests.get(testurl, headers=headers)
     # 更改网页编码--------不改会乱码
     res.encoding = "GBK"
@@ -134,7 +141,7 @@ def getalldoc():
     aas = soup.find_all("a")
     # 先创建目录
     mkdir("E:\\Python爬取的文件\\")
-    for a in aas[4:]:
+    for a in aas[12:]:
         string_a = a.next_element
         if string_a == '京ICP备05034670号':
             break
