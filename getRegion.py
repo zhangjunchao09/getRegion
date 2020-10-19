@@ -47,11 +47,14 @@ def geturl(url, code, path, l):
                 string_a_url = bashUrl + path + str(tr.a.get("href"))
                 path_tmp = path + str(tr.a.get("href")).split('/')[0] + '/'
             if l == 4:
-                string_a_url = bashUrl + path + str(tr.a.get("href"))
-                path_tmp = path + str(tr.a.get("href")).split('/')[0] + '/'
+                tds = tr.find_all("td")
+                td1 = tds[0]
+                td2 = tds[1]
+                mlist = str(td1.a.string) + "\t" + str(td2.a.string)
+                writedoc(mlist, code, l)
             if l == 5:
                 string_a_url = bashUrl + path + str(tr.a.get("href"))
-            if l <= 5:
+            if l < 4:
                 time.sleep(3) # 休眠3秒
                 geturl(string_a_url, code, path_tmp, l)
                 tds = tr.find_all("td")
@@ -59,7 +62,6 @@ def geturl(url, code, path, l):
                 td2 = tds[1]
                 mlist = str(td1.a.string) + "\t" + str(td2.a.string)
                 writedoc(mlist, code, l)
-
 
 
 # 获取目标网址
