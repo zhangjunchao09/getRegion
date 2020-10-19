@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import os
+import time
 
 # 服务器反爬虫机制会判断客户端请求头中的User-Agent是否来源于真实浏览器，所以，我们使用Requests经常会指定UA伪装成浏览器发起请求
 headers = {'user-agent': 'Mozilla/5.0'}
@@ -13,7 +14,7 @@ def writedoc(ss, code, l):
     # 编码为utf-8
     with open("E:\\Python爬取的文件\\" + code + ".txt", 'a', encoding='utf-8') as f:
         # 写文件
-        ss = ss + ' ' + str(l)
+        ss = ss + '\t' + str(l)
         f.write(ss + '\r\n')
         print(ss)
 
@@ -36,26 +37,29 @@ def geturl(url, code, path, l):
                 tds = tr.find_all("td")
                 td1 = tds[0]
                 td2 = tds[1]
-                mlist = str(td1.string) + " " + str(td2.string)
+                mlist = str(td1.string) + "\t" + str(td2.string)
                 writedoc(mlist, code, l)
         else:
             if l == 2:
-                string_aurl = bashUrl + str(tr.a.get("href"))
+                string_a_url = bashUrl + str(tr.a.get("href"))
+                path_tmp = path
             if l == 3:
-                string_aurl = bashUrl + path + str(tr.a.get("href"))
-                path = path + str(tr.a.get("href")).split('/')[0] + '/'
+                string_a_url = bashUrl + path + str(tr.a.get("href"))
+                path_tmp = path + str(tr.a.get("href")).split('/')[0] + '/'
             if l == 4:
-                string_aurl = bashUrl + path + str(tr.a.get("href"))
-                path = path + str(tr.a.get("href")).split('/')[0] + '/'
+                string_a_url = bashUrl + path + str(tr.a.get("href"))
+                path_tmp = path + str(tr.a.get("href")).split('/')[0] + '/'
             if l == 5:
-                string_aurl = bashUrl + path + str(tr.a.get("href"))
+                string_a_url = bashUrl + path + str(tr.a.get("href"))
             if l <= 5:
-                geturl(string_aurl, code, path, l)
+                time.sleep(3) # 休眠3秒
+                geturl(string_a_url, code, path_tmp, l)
                 tds = tr.find_all("td")
                 td1 = tds[0]
                 td2 = tds[1]
-                mlist = str(td1.a.string) + " " + str(td2.a.string)
+                mlist = str(td1.a.string) + "\t" + str(td2.a.string)
                 writedoc(mlist, code, l)
+
 
 
 # 获取目标网址
@@ -73,27 +77,26 @@ def getalldoc():
     aas = soup.find_all("a")
     # 先创建目录
     mkdir("E:\\Python爬取的文件\\")
+    for a in aas:
+        string_a = a.next_element
+        if string_a == '京ICP备05034670号':
+            break
+        path = str(a.get("href")).split('.')[0] + "/"
+        l = 1
+        string_aurl = bashUrl + str(a.get("href"))
+        # 请求详细页面
+        geturl(string_aurl, string_a, path, l)
+        writedoc(string_a, string_a, l)
+#    a = aas[3]
+#    string_a = a.next_element
+#    path = str(a.get("href")).split('.')[0] + "/"
+#    l = 1
+#    string_a_url = bashUrl + str(a.get("href"))
+#    # 请求详细页面
+#    geturl(string_a_url, string_a, path, l)
+#    writedoc(string_a, string_a, l)
 
-    a = aas[0]
-    string_a = a.next_element
-    path = str(a.get("href")).split('.')[0] + "/"
-    l = 1
-    string_aurl = bashUrl + str(a.get("href"))
-    # 请求详细页面
-    geturl(string_aurl, string_a, path, l)
-    writedoc(string_a, string_a, l)
 
-
-#   for a in aas:
-#       string_a = a.next_element
-#       if string_a == '京ICP备05034670号':
-#           break
-#       path = str(a.get("href")).split('.')[0] + "/"
-#       l = 1
-#       string_aurl = bashUrl + str(a.get("href"))
-#       # 请求详细页面
-#       geturl(string_aurl, string_a, path, l)
-#       writedoc(string_a, string_a, l)
 
 
 def mkdir(path):
