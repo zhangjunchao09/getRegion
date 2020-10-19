@@ -27,6 +27,9 @@ def get_town_url(url, code, path):
     l = 4
     # 请求详细页面
     r = requests.get(url, headers=headers)
+    while r.status_code != 200:
+        time.sleep(5)
+        r = requests.get(url, headers=headers)
     # 改编码
     r.encoding = "GBK"
     soup = BeautifulSoup(r.text, "html.parser")
@@ -53,6 +56,9 @@ def get_county_url(url, code, path):
     l = 3
     # 请求详细页面
     r = requests.get(url, headers=headers)
+    while r.status_code != 200:
+        time.sleep(5)
+    r = requests.get(url, headers=headers)
     # 改编码
     r.encoding = "GBK"
     soup = BeautifulSoup(r.text, "html.parser")
@@ -75,7 +81,6 @@ def get_county_url(url, code, path):
             td2 = tds[1]
             mlist = str(td1.a.string) + "\t" + str(td2.a.string)
             writedoc(mlist, code, l)
-            time.sleep(60)  # 休眠3秒
             get_town_url(string_a_url, code, path_tmp)
 
 # 根据详细页面url获取目标字符串
@@ -83,13 +88,16 @@ def get_city_url(url, code, path):
     l = 2
     # 请求详细页面
     r = requests.get(url, headers=headers)
+    while r.status_code != 200:
+        time.sleep(5)
+        r = requests.get(url, headers=headers)
     # 改编码
     r.encoding = "GBK"
     soup = BeautifulSoup(r.text, "html.parser")
     # 找出类名为 info-zi mb15 下的所有p标签
     trs = soup.findAll('tr', {'class': {'citytr'}})
     # 用来储存最后需要写入文件的字符串
-    for tr in trs[3:]:
+    for tr in trs:
         aas = tr.find_all("a")
         if len(aas) == 0:
             tds = tr.find_all("td")
@@ -105,7 +113,6 @@ def get_city_url(url, code, path):
             td2 = tds[1]
             mlist = str(td1.a.string) + "\t" + str(td2.a.string)
             writedoc(mlist, code, l)
-            time.sleep(60)  # 休眠3秒
             get_county_url(string_a_url, code, path_tmp)
 
 
@@ -115,6 +122,9 @@ def getalldoc():
     testurl = bashUrl + "index.html"
     # 使用request去get目标网址
     res = requests.get(testurl, headers=headers)
+    while res.status_code != 200:
+        time.sleep(5)
+        res = requests.get(testurl, headers=headers)
     # 更改网页编码--------不改会乱码
     res.encoding = "GBK"
     # 创建一个BeautifulSoup对象
@@ -124,7 +134,7 @@ def getalldoc():
     aas = soup.find_all("a")
     # 先创建目录
     mkdir("E:\\Python爬取的文件\\")
-    for a in aas[3:4]:
+    for a in aas[4:]:
         string_a = a.next_element
         if string_a == '京ICP备05034670号':
             break
