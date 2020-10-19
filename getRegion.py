@@ -141,7 +141,7 @@ def getalldoc():
     aas = soup.find_all("a")
     # 先创建目录
     mkdir("E:\\Python爬取的文件\\")
-    for a in aas[12:]:
+    for a in aas:
         string_a = a.next_element
         if string_a == '京ICP备05034670号':
             break
